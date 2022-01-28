@@ -24,17 +24,19 @@ namespace CirclePipeline.BusinessLayer
         }
 
 
-        public async Task<List<string>> GetTestNames(string projectRepo, string projectName, string gitToken)
+        public async Task<List<string>> GetTestNames(string projectRepo, string projectName, string path)
         {
             string plainText;
             List<string> testName = new List<string>();
             string[] aText;
 
-            var url = $"/api/v3/repos/{projectRepo}/{projectName}/contents/Items.cs";
+            //var url = $"/api/v3/repos/{projectRepo}/{projectName}/contents/{path}";
+            var url = $"/api/v3/repos/{projectRepo}/{projectName}";
             client.BaseAddress = new Uri(config["Git-Uri"]);
-            //client.DefaultRequestHeaders.Add("Authorization", config["Git-Authorization"]);
-            client.DefaultRequestHeaders.Add("Authorization", $" Bearer {gitToken}");
-
+            client.DefaultRequestHeaders.Add("Authorization", config["Git-Authorization"]);
+            client.DefaultRequestHeaders.Add("Accept", "application/vnd.github.v3+json");
+            client.DefaultRequestHeaders.Add("User-Agent", "CirclePipeline");
+            
             HttpResponseMessage response = await client.GetAsync(url);
             string msg = await response.Content.ReadAsStringAsync(); //returns http response message as a string
             JObject jobObj = JObject.Parse(msg);

@@ -19,10 +19,10 @@ namespace GitPipeline
             this.gitPipelineManagementService = gitPipelineManagementService;
         }
 
-        [HttpGet("repos/{projectRepo}/{projectName}/contents/Tests/LoadTest.js")]
-        public async Task<object> GetTestNames([Required] string projectRepo, [Required] string projectName, [Required] string gitToken)
+        [HttpGet("repos/{projectRepo}/{projectName}/contents/{path}")]
+        public async Task<object> GetTestNames([Required] string projectRepo, [Required] string projectName, [Required] string path)
         {
-            var getPipelineId = await this.gitPipelineManagementService.GetTestNames(projectRepo, projectName, gitToken);
+            var getPipelineId = await this.gitPipelineManagementService.GetTestNames(projectRepo, projectName, path);
             return this.Ok(getPipelineId);
         }
 
