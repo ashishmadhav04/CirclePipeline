@@ -10,16 +10,17 @@ namespace CirclePipeline.BusinessLayer
 {
     public class GitPipelineManagementService : IGitPipelineManagementService
     {
-        private readonly HttpClient client;
+        private readonly HttpClient client = new HttpClient();
         private readonly IConfiguration config;
 
         public GitPipelineManagementService(HttpClient client, IConfiguration config)
         {
             this.client = client;
-            this.config = config;
+            config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
         public GitPipelineManagementService()
         {
+            config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
 
 
@@ -29,7 +30,7 @@ namespace CirclePipeline.BusinessLayer
             List<string> testName = new List<string>();
             string[] aText;
 
-            var url = $"/api/v3/repos/{projectRepo}/{projectName}/contents/Tests/LoadTest.js";
+            var url = $"/api/v3/repos/{projectRepo}/{projectName}/contents/Items.cs";
             client.BaseAddress = new Uri(config["Git-Uri"]);
             //client.DefaultRequestHeaders.Add("Authorization", config["Git-Authorization"]);
             client.DefaultRequestHeaders.Add("Authorization", $" Bearer {gitToken}");

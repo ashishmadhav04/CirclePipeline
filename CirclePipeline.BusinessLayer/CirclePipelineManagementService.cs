@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using CirclePipeline.BusinessLayer.Interfaces;
 using CirclePipeline.Model;
@@ -8,29 +7,32 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace CirclePipeline.BusinessLayer
 {
     public class CirclePipelineManagementService : ICirclePipelineManagementService
     {
-        private readonly HttpClient client;
+        private readonly HttpClient client = new HttpClient();
         private readonly IConfiguration config;
+        //HttpClient client = new HttpClient();
 
         public CirclePipelineManagementService(HttpClient client, IConfiguration config)
         {
             this.client = client;
-            this.config = config;
+            config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
         public CirclePipelineManagementService()
         {
+            config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
         }
 
         public async Task<object> GetProjectDetails(string projectRepo, string projectName)
         {
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -47,9 +49,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> GetProjectPipeline(string projectRepo, string projectName)
         {
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/pipeline";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -61,9 +63,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> GetSinglePipeline(string pipelineId)
         {
             var url = $"/api/v2/pipeline/{pipelineId}";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
             response.StatusCode.ToString();
@@ -82,9 +84,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> GetPipelineWorkflows(string pipelineId)
         {
             var url = $"/api/v2/pipeline/{pipelineId}/workflow";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -94,9 +96,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> GetWorkflow(string workflowId)
         {
             var url = $"/api/v2/workflow/{workflowId}";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
             return await response.Content.ReadAsStringAsync();
@@ -105,9 +107,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> GetWorkflowJobs(string workflowId)
         {
             var url = $"/api/v2/workflow/{workflowId}/job";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -127,9 +129,9 @@ namespace CirclePipeline.BusinessLayer
             //JsonContent content1 = JsonContent.Create(jobRerun);
 
             var url = $"/api/v2/workflow/{workflowId}/rerun";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.PostAsync(url, content);
 
@@ -141,9 +143,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> PostApproveJob(string workflowId, string approvalId)
         {
             var url = $"/api/v2/workflow/{workflowId}/approve/{approvalId}";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.PostAsync(url, null);
 
@@ -155,9 +157,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> PostCancelJob(string projectRepo, string projectName, string jobId)
         {
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/job/{jobId}/cancel";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.PostAsync(url, null);
 
@@ -173,9 +175,9 @@ namespace CirclePipeline.BusinessLayer
             Console.WriteLine(content);
 
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/envvar";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.PostAsync(url, content);
 
@@ -187,9 +189,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<string> DeleteEnvironmentVariable(string projectRepo, string projectName, string envVariableName)
         {
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/envvar/{envVariableName}";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.DeleteAsync(url);
 
@@ -207,9 +209,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<List<string>> GetPipelineId(string projectRepo, string projectName)
         {
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/pipeline";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
             string msg = await response.Content.ReadAsStringAsync(); //returns http response message as a string
@@ -233,9 +235,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<List<string>> GetWorkflowsId(string pipelineId)
         {
             var url = $"/api/v2/pipeline/{pipelineId}/workflow";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
             string message = await response.Content.ReadAsStringAsync();
@@ -258,9 +260,9 @@ namespace CirclePipeline.BusinessLayer
         public async Task<List<string>> GetJobsId(string workflowId)
         {
             var url = $"/api/v2/workflow/{workflowId}/job";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage response = await client.GetAsync(url);
 
@@ -303,9 +305,9 @@ namespace CirclePipeline.BusinessLayer
             JObject finalValue = new JObject();
 
             var pipeLineUrl = $"/api/v2/project/gh/{projectRepo}/{projectName}/pipeline";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             HttpResponseMessage pipeLineResponse = await client.GetAsync(pipeLineUrl);
             string pipeLinemsg = await pipeLineResponse.Content.ReadAsStringAsync(); //returns http response message as a string
@@ -417,9 +419,9 @@ namespace CirclePipeline.BusinessLayer
             }*/
 
             var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/envvar";
-            client.BaseAddress = new Uri(config["Uri"]);
-            client.DefaultRequestHeaders.Add("Circle-Token", config["Circle-Token"]);
-            client.DefaultRequestHeaders.Add("Authorization", config["Authorization"]);
+            client.BaseAddress = new Uri(this.config["Uri"]);
+            client.DefaultRequestHeaders.Add("Circle-Token", this.config["Circle-Token"]);
+            client.DefaultRequestHeaders.Add("Authorization", this.config["Authorization"]);
 
             Dictionary<string, object> dcircleVariables = new Dictionary<string, object>();
 

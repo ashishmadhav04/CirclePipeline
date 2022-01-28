@@ -22,5 +22,6 @@ namespace CirclePipeline
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+
     }
 }
