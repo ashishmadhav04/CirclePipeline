@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using CirclePipeline.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Xunit;
 
 namespace CirclePipeline.APITests
 {
@@ -53,6 +55,25 @@ namespace CirclePipeline.APITests
                 return data;
             }
 
+        }
+
+        public async Task<EnvVariable> AddEnvironmentVariable(string projectRepo, string projectName, EnvVariable body)
+        {
+            var json = JsonConvert.SerializeObject(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var url = $"/api/v2/project/gh/{projectRepo}/{projectName}/envvar";
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri(iconfig["Uri"]);
+                httpClient.DefaultRequestHeaders.Add("Circle-Token", iconfig["Circle-Token"]);
+                httpClient.DefaultRequestHeaders.Add("Authorization", iconfig["Authorization"]);
+
+                HttpResponseMessage msg = await httpClient.PostAsync(url, content);
+                Assert.True(msg.IsSuccessStatusCode);
+                string data = await msg.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<EnvVariable>(data);
+            }
         }
     }
 }
